@@ -11,6 +11,7 @@ Vagrant.configure("2") do |config|
      vb.memory = "600"
    end
     db01.vm.provision "shell", path: "mysql.sh"
+    db01.vm.provision "shell", path: "node-exporter-centos.sh"
 
   end
 
@@ -23,6 +24,8 @@ Vagrant.configure("2") do |config|
      vb.memory = "600"
    end
     mc01.vm.provision "shell", path: "memcache.sh"
+    mc01.vm.provision "shell", path: "node-exporter-centos.sh"
+
   end
 
 ### RabbitMQ vm  ####
@@ -34,6 +37,7 @@ Vagrant.configure("2") do |config|
      vb.memory = "600"
    end
     rmq01.vm.provision "shell", path: "rabbitmq.sh"
+    rmq01.vm.provision "shell", path: "node-exporter-centos.sh"
   end
 
 ### tomcat vm ###
@@ -45,6 +49,8 @@ Vagrant.configure("2") do |config|
     app01.vm.provider "virtualbox" do |vb|
      vb.memory = "800"
    end
+   app01.vm.provision "shell", path: "node-exporter-centos.sh"
+   app01.vm.provision "shell", path: "tomcat.sh"
    end
 
 
@@ -55,10 +61,22 @@ Vagrant.configure("2") do |config|
   web01.vm.network "private_network", ip: "192.168.56.11"
 #  web01.vm.network "public_network"
   web01.vm.provider "virtualbox" do |vb|
-     vb.gui = true
-     vb.memory = "800"
+     vb.memory = "1024"
    end
   web01.vm.provision "shell", path: "nginx.sh"
+  web01.vm.provision "shell", path: "node-exporter-ubuntu.sh"
 end
+
+###Observability VM ###
+  config.vm.define "obs01" do |obs01|
+    obs01.vm.box = "ubuntu/jammy64"
+    obs01.vm.hostname = "obs01"
+  obs01.vm.network "private_network", ip: "192.168.56.20"
+  obs01.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+  end
+  obs01.vm.provision "shell", path: "prometheus-grafana.sh"
+  end 
 
 end
