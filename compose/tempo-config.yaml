@@ -1,0 +1,34 @@
+# Tempo server configuration
+server:
+  http_listen_port: 3200  # Tempo HTTP API port
+
+# Distributor configuration for receiving traces
+distributor:
+  receivers:
+    otlp:  # OpenTelemetry Protocol receiver
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317  # OTLP gRPC endpoint
+        http:
+          endpoint: 0.0.0.0:4318  # OTLP HTTP endpoint
+
+# Storage configuration for traces
+storage:
+  trace:
+    backend: local  # Use local filesystem storage
+    local:
+      path: /var/tempo/traces  # Trace storage directory
+    wal:
+      path: /var/tempo/wal  # Write-ahead log directory
+
+# Query frontend configuration for trace search
+query_frontend:
+  search:
+    max_duration: 0s  # Maximum time range for trace search
+ingester:
+  max_block_duration: 5m  # Maximum block duration before flushing
+
+# Compactor configuration for trace optimization
+compactor:
+  compaction:
+    block_retention: 72h  # Keep trace blocks for 72 hours

@@ -1,0 +1,46 @@
+# Authentication configuration
+auth_enabled: false
+
+# Server settings
+server:
+  http_listen_port: 3100  # Loki HTTP API port
+
+# Ingester configuration for log chunks
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory  # In-memory key-value store
+      replication_factor: 1
+  chunk_idle_period: 5m  # How long before idle chunks are flushed
+  chunk_retain_period: 30s  # How long to keep chunks in memory
+
+# Schema configuration for storing logs
+schema_config:
+  configs:
+    - from: 2024-01-01  # Schema version start date
+      store: tsdb  # Time-series database store
+      object_store: filesystem  # Where to store log data
+      schema: v13  # Schema version
+      index:
+        prefix: index_  # Index file prefix
+        period: 24h  # Index period
+
+# Storage configuration for logs and indexes
+storage_config:
+  tsdb_shipper:
+    active_index_directory: /loki/index  # Local index directory
+    cache_location: /loki/cache  # Cache location
+  filesystem:
+    directory: /loki/chunks  # Where to store log chunks
+
+# Limits and retention configuration
+limits_config:
+  retention_period: 168h  # Keep logs for 7 days
+
+# Compactor configuration for log cleanup
+compactor:
+  working_directory: /loki/compactor  # Compactor working directory
+  compaction_interval: 10m  # How often to run compaction
+  retention_enabled: true  # Enable log retention
+  delete_request_store: filesystem  # Where to store delete requests

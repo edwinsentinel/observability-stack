@@ -1,0 +1,17 @@
+# Prometheus global configuration
+global:
+  scrape_interval: 15s  # How often to scrape metrics from targets
+  evaluation_interval: 15s  # How often to evaluate alert rules  
+
+# Define scrape configurations for metric collection
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: 'prometheus'  # Job identifier
+    static_configs:
+      - targets: ['localhost:9090']  # Prometheus API endpoint
+  - job_name: 'loki'  # Job identifier for Loki
+    static_configs:
+      - targets: ['loki:3100']  # Loki API endpoint for metrics
+  - job_name: 'tempo'  # Job identifier for Tempo
+    static_configs:
+      - targets: ['tempo:3200']  # Tempo API endpoint for metrics    

@@ -1,0 +1,62 @@
+# Observability Stack - Prometheus and Loki
+services:
+  # Prometheus - Time-series metrics database
+  prometheus:
+    image: prom/prometheus:v3.9.1 
+    container_name: prometheus
+    command:  # Prometheus startup arguments
+      - '--config.file=/etc/prometheus/prometheus.yaml'  # Config file location
+      - '--storage.tsdb.path=/prometheus'  # TSDB storage location
+      - '--storage.tsdb.retention.time=15d'  # Keep metrics for 15 days
+    volumes:  # Mount configuration and data
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml:ro  # Read-only config
+      - prometheus-data:/prometheus  # Persistent metrics storage
+    ports:  # Expose Prometheus UI
+      - '9090:9090'  # Prometheus web UI and API
+    networks:  # Connect to observability network
+      - observability
+    restart: unless-stopped  # Auto-restart on failure
+
+  # Loki - Log aggregation system
+  loki:
+    image: grafana/loki:3.6.6
+    container_name: loki
+    user: root  # Run as root for file permissions
+    command:  # Loki startup arguments
+      - '-config.file=/etc/loki/loki-config.yaml'  # Config file location
+      - '-target=all'  # Run all Loki components
+    volumes:  # Mount configuration and data
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro  # Read-only config
+      - loki-data:/loki  # Log chunk storage
+      - loki-wal:/wal  # Write-ahead log
+    ports:  # Expose Loki API
+      - '3100:3100'  # Loki HTTP API
+    networks:  # Connect to observability network
+      - observability
+    restart: unless-stopped  # Auto-restart on failure
+
+  # Tempo - Distributed tracing system
+  tempo:
+    image: grafana/tempo:2.10.1
+    container_name: tempo
+    command:  # Tempo startup arguments
+      - '-config.file=/etc/tempo/tempo-config.yaml'  # Config file location
+      - '-target=all'  # Run all Tempo components
+    volumes:  # Mount configuration and data
+      - ./tempo-config.yaml:/etc/tempo/tempo-config.yaml:ro  # Read-only config
+    ports:  # Expose Tempo API
+      - '3200:3200'  # Tempo HTTP API
+    networks:  # Connect to observability network
+      - observability
+    restart: unless-stopped  # Auto-restart on failure
+
+
+
+
+
+# Named volumes for persistent storage
+volumes:
+  prometheus-data:  # Prometheus metrics storage
+  loki-data:  # Loki log chunks
+  loki-wal:  # Loki write-ahead logs
+  tempo-data:  # Tempo trace storage
