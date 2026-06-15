@@ -54,7 +54,7 @@ Take the fully instrumented application and deploy it — together with the comp
 
 ## 🏗️ Application Versions
 
-The demo application evolves across the course. Each lab section references a specific version — download the ZIP from the course platform and extract it to your working directory before starting the corresponding labs.
+The demo application evolves across my learning. Each lab section references a specific version — download the ZIP from the course platform and extract it to your working directory before starting the corresponding labs.
 
 | Version    | Description                                                            | Docker Images                                                                                                                               |
 | ---------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,6 +62,6 @@ The demo application evolves across the course. Each lab section references a sp
 | **v1.2.0** | Frontend fully instrumented — metrics, traces, and logs                | [frontend](https://hub.docker.com/r/lmacademy/web-translator-frontend) • [worker](https://hub.docker.com/r/lmacademy/web-translator-worker) |
 | **v1.3.0** | Both frontend and worker fully instrumented — end-to-end observability | [frontend](https://hub.docker.com/r/lmacademy/web-translator-frontend) • [worker](https://hub.docker.com/r/lmacademy/web-translator-worker) |
 
-Pre-built Docker images are available for every version and are tagged accordingly (e.g. `lmacademy/web-translator-frontend:v1.3.0`). Images are built for both `linux/amd64` and `linux/arm64`.
+
 
 
