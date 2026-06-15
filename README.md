@@ -5,15 +5,31 @@ A complete observability stack built with Docker Compose, featuring **Prometheus
 ## 📁 Project Structure
 
 ```
-├── compose/                    # Docker Compose setup for observability stack
-│   ├── compose.yaml           # Main orchestration file
-│   ├── compose.observability.yaml  # Observability stack services
-│   ├── prometheus.yaml        # Prometheus metrics configuration
-│   ├── loki-config.yaml       # Loki logging configuration
-│   ├── tempo-config.yaml      # Tempo distributed tracing configuration
-│   └── test_scripts/          # Validation and testing scripts
-├── section-setup/             # Lab guides and deployment instructions
-└── README.md                  # This file
+opentelemetrycode/
+├── compose/                          # Docker Compose orchestration
+│   ├── compose.yaml                 # Main compose file (includes observability stack)
+│   ├── compose.observability.yaml   # Observability services definitions
+│   ├── prometheus.yaml              # Prometheus configuration (metrics scraping, retention)
+│   ├── loki-config.yaml             # Loki configuration (log pipelines, storage)
+│   ├── tempo-config.yaml            # Tempo configuration (trace ingestion, storage)
+│   ├── grafana-datasources.yaml     # Grafana datasource auto-provisioning
+│   └── test_scripts/                # Validation and testing scripts
+│       ├── validate-loki.sh         # Test Loki log ingestion and querying
+│       ├── validate-tempo.sh        # Test Tempo trace ingestion and storage
+│       ├── validate-grafana.sh      # Test Grafana and datasource connectivity
+│       ├── generate-traffic.sh      # Generate sample observability data
+│       ├── cleanup-loki.sh          # Remove test data from Loki
+│       └── loki-promql-queries.md   # Example PromQL and LogQL queries
+├── section-setup/                    # Deployment guides and lab instructions
+│   ├── INDEX.md                     # Guide index
+│   ├── lab-setup.md                 # Initial setup instructions
+│   ├── lab-deploy-prometheus.md     # Prometheus deployment guide
+│   ├── lab-deploy-loki.md           # Loki deployment guide
+│   ├── lab-deploy-tempo.md          # Tempo deployment guide
+│   ├── lab-deploy-grafana.md        # Grafana deployment guide
+│   └── lab-deploy-application.md    # Application deployment guide
+├── README.md                         # This file
+└── .git/                             # Git repository
 ```
 
 ## 🚀 Quick Start
@@ -69,9 +85,15 @@ Use the provided test scripts to validate your observability stack:
 
 ```bash
 cd compose/test_scripts
-./validate-loki.sh        # Test Loki connectivity
-./generate-traffic.sh     # Generate sample data
-./cleanup-loki.sh         # Clean up test data
+
+# Validate each component
+./validate-loki.sh        # Test Loki connectivity and log storage
+./validate-tempo.sh       # Test Tempo connectivity and trace ingestion
+./validate-grafana.sh     # Test Grafana and verify datasource configuration
+
+# Additional testing
+./generate-traffic.sh     # Generate sample data for testing
+./cleanup-loki.sh         # Clean up test data from Loki
 ```
 
 Refer to `loki-promql-queries.md` for example PromQL and LogQL queries.

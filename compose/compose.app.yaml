@@ -1,0 +1,54 @@
+# Application Services
+# Translation application with frontend, worker, and Redis message broker
+# This file defines the demo application services used with the observability stack
+
+services:
+  # Redis - In-memory message broker for distributed communication
+  redis:
+    image: redis:8.6.0-alpine  # Lightweight Alpine Linux Redis image
+    container_name: redis
+    ports:
+      - '6379:6379'  # Expose Redis port for frontend and worker communication
+    networks:
+      - app  # Connect to application network
+    healthcheck:  # Ensure Redis is healthy before other services start
+      test: ['CMD', 'redis-cli', 'ping']  # Verify Redis responds to ping
+      interval: 5s  # Check health every 5 seconds
+      timeout: 3s  # Timeout each check after 3 seconds
+      retries: 5  # Fail after 5 failed checks
+    restart: unless-stopped  # Auto-restart on failure
+
+  # Frontend - Node.js web application for translation requests
+  frontend:
+    image: lmacademy/web-translator-frontend:v1.1.0  # Frontend container image
+    container_name: frontend
+    ports:
+      - '3001:3000'  # Map local port 3001 to container port 3000
+    environment:  # Application configuration
+      - REDIS_HOST=redis  # Redis service hostname
+      - REDIS_PORT=6379  # Redis port
+      - PORT=3000  # Application port inside container
+      - LOG_LEVEL=info  # Logging verbosity level
+      - SOURCE_LANGUAGE=en  # Default source language for translations
+    depends_on:  # Wait for Redis to be healthy
+      redis:
+        condition: service_healthy  # Only start after Redis health check passes
+    networks:
+      - app  # Connect to application network
+    restart: unless-stopped  # Auto-restart on failure
+
+  # Worker - Python background worker for processing translation jobs
+  worker:
+    image: lmacademy/web-translator-worker:v1.1.0  # Worker container image
+    container_name: worker
+    environment:  # Application configuration
+      - REDIS_HOST=redis  # Redis service hostname
+      - REDIS_PORT=6379  # Redis port
+      - LOG_LEVEL=info  # Logging verbosity level
+      - SOURCE_LANGUAGE=en  # Default source language for translations
+    depends_on:  # Wait for Redis to be healthy
+      redis:
+        condition: service_healthy  # Only start after Redis health check passes
+    networks:
+      - app  # Connect to application network
+    restart: unless-stopped  # Auto-restart on failure
