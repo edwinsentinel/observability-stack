@@ -1,0 +1,42 @@
+# Grafana Datasources Configuration
+# Automatically provisions Prometheus, Loki, and Tempo as datasources
+apiVersion: 1
+
+datasources:
+  # Prometheus - Metrics datasource for time-series data
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true  # Default datasource for new dashboards
+    editable: false
+    jsonData:
+      timeInterval: 15s  # Default scrape interval
+      httpMethod: POST
+
+  # Loki - Logs datasource for log aggregation and querying
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 1000  # Maximum log lines returned per query
+
+  # Tempo - Distributed Traces datasource with cross-datasource linking
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false
+    jsonData:
+      # Link traces to logs - click trace spans to view related logs in Loki
+      tracesToLogsV2:
+        datasourceUid: Loki
+        tags: ['job', 'instance']  # Tags used to correlate traces and logs
+      # Link traces to metrics - view metrics for services in traces
+      tracesToMetrics:
+        datasourceUid: Prometheus
+      # Service map visualization - show service relationships from metrics
+      serviceMap:
+        datasourceUid: Prometheus

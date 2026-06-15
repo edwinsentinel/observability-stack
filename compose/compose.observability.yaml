@@ -1,4 +1,5 @@
-# Observability Stack - Prometheus and Loki
+# Observability Stack - Complete monitoring platform
+# Includes Prometheus (metrics), Loki (logs), Tempo (traces), and Grafana (visualization)
 services:
   # Prometheus - Time-series metrics database
   prometheus:
@@ -50,13 +51,34 @@ services:
       - observability
     restart: unless-stopped  # Auto-restart on failure
 
+  # Grafana - Visualization and alerting platform
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:  # Configure Grafana settings
+      - GF_AUTH_ANONYMOUS_ENABLED=true  # Allow anonymous access without login
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin  # Grant admin privileges to anonymous users
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Default admin password
+    volumes:  # Mount configuration and data
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro  # Auto-provision datasources
+      - grafana-data:/var/lib/grafana  # Persistent dashboard and settings storage
+    ports:  # Expose Grafana web UI
+      - '3000:3000'  # Grafana web interface
+    networks:  # Connect to observability network
+      - observability
+    restart: unless-stopped  # Auto-restart on failure
+    depends_on:  # Wait for these services before starting
+      - prometheus  # Requires Prometheus for metrics
+      - loki  # Requires Loki for logs
+      - tempo  # Requires Tempo for traces
 
 
 
 
-# Named volumes for persistent storage
+
+# Named volumes for persistent data storage across container restarts
 volumes:
-  prometheus-data:  # Prometheus metrics storage
-  loki-data:  # Loki log chunks
-  loki-wal:  # Loki write-ahead logs
-  tempo-data:  # Tempo trace storage
+  prometheus-data:  # Stores time-series metrics data (15-day retention)
+  loki-data:  # Stores compressed log chunks
+  loki-wal:  # Stores Loki write-ahead logs for durability
+  grafana-data:  # Stores Grafana dashboards, provisioning configs, and settings

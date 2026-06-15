@@ -1,66 +1,92 @@
-# OpenTelemetry for Observability
+# OpenTelemetry Observability Stack
 
-├── app-versions/        # Versioned ZIP snapshots of the demo application
-├── compose/             # Docker Compose files and observability stack configs
-├── k8s/                 # Kubernetes manifests (bonus section)
-└── labs/                # Step-by-step lab guides, organised by course section
-    ├── section-setup/
-    ├── section-single-system/
-    ├── section-distributed-systems/
-    └── section-kubernetes/
+A complete observability stack built with Docker Compose, featuring **Prometheus**, **Loki**, and **Tempo** for comprehensive metrics, logs, and distributed tracing.
+
+## 📁 Project Structure
+
+```
+├── compose/                    # Docker Compose setup for observability stack
+│   ├── compose.yaml           # Main orchestration file
+│   ├── compose.observability.yaml  # Observability stack services
+│   ├── prometheus.yaml        # Prometheus metrics configuration
+│   ├── loki-config.yaml       # Loki logging configuration
+│   ├── tempo-config.yaml      # Tempo distributed tracing configuration
+│   └── test_scripts/          # Validation and testing scripts
+├── section-setup/             # Lab guides and deployment instructions
+└── README.md                  # This file
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-Before your first lab, make sure you have the following installed:
+- **Docker** and **Docker Compose** installed
+- Port availability: 3000 (Grafana), 9090 (Prometheus), 3100 (Loki), 3200 (Tempo)
 
-- **Docker** and **Docker Compose** — used throughout the course for running the application and observability stack locally
-- **kubectl** — required for the Kubernetes bonus section
-- A local Kubernetes cluster (**Kind**, **Minikube**, or **Docker Desktop**) — required for the bonus section only
+### Start the Observability Stack
 
-Run through the setup lab to verify everything is in place:
+```bash
+cd compose
+docker-compose up -d
+```
 
-👉 [`labs/section-setup/`](labs/section-setup/INDEX.md)
+## 📊 Observability Components
 
-## 📚 Lab Sections
+### Prometheus (Metrics)
+- **Image:** `prom/prometheus:v3.9.1`
+- **Port:** `9090`
+- **Function:** Time-series metrics database and monitoring
+- **Retention:** 15 days
+- **URL:** http://localhost:9090
 
-Work through the sections in order. Each section has an `INDEX.md` with a numbered list of labs.
+### Loki (Logs)
+- **Image:** `grafana/loki:3.6.6`
+- **Port:** `3100`
+- **Function:** Log aggregation and querying system
+- **URL:** http://localhost:3100 (API endpoint)
 
-### 1. Setup
+### Tempo (Distributed Traces)
+- **Image:** `grafana/tempo:2.10.1`
+- **Port:** `3200`
+- **Function:** Distributed tracing backend for trace storage and querying
+- **URL:** http://localhost:3200 (API endpoint)
 
-Get your local environment ready and spin up the full observability stack (Prometheus, Loki, Tempo, Grafana) with Docker Compose.
+### Grafana (Visualization)
+- **Image:** `grafana/grafana:latest`
+- **Port:** `3000`
+- **Function:** Unified dashboard and visualization platform
+- **URL:** http://localhost:3000
+- **Features:**
+  - Anonymous access enabled (no login required)
+  - Auto-provisioned datasources (Prometheus, Loki, Tempo)
+  - Trace-to-logs and trace-to-metrics correlation
+  - Service map visualization
+- **Configuration:** [grafana-datasources.yaml](compose/grafana-datasources.yaml)
 
-👉 [`labs/section-setup/`](labs/section-setup/INDEX.md)
+## 🧪 Testing & Validation
 
-### 2. Single System Instrumentation
+Use the provided test scripts to validate your observability stack:
 
-Instrument the Node.js frontend end-to-end: start with auto-instrumentation, then layer in custom business metrics, manual traces, structured logs, and log-to-trace correlation.
+```bash
+cd compose/test_scripts
+./validate-loki.sh        # Test Loki connectivity
+./generate-traffic.sh     # Generate sample data
+./cleanup-loki.sh         # Clean up test data
+```
 
-👉 [`labs/section-single-system/`](labs/section-single-system/INDEX.md)
+Refer to `loki-promql-queries.md` for example PromQL and LogQL queries.
 
-### 3. Distributed Systems Observability
+## 🔧 Configuration
 
-Instrument the Python worker and connect the two services through distributed tracing over Redis. By the end of this section, a single translation request will appear as one connected trace spanning the frontend and the worker.
+Each component has a dedicated configuration file:
 
-👉 [`labs/section-distributed-systems/`](labs/section-distributed-systems/INDEX.md)
+- **prometheus.yaml** — Scrape targets, job definitions, and alerting rules
+- **loki-config.yaml** — Log ingestion pipeline and retention policies
+- **tempo-config.yaml** — Trace ingestion and backend storage
 
-### 4. Deploying to Kubernetes _(Bonus)_
+## 📚 Lab Guides
 
-Take the fully instrumented application and deploy it — together with the complete observability stack — to a local Kubernetes cluster. You will write the manifests, wire them together with Kustomize, and verify that all three telemetry signals flow correctly in the new environment.
-
-👉 [`labs/section-kubernetes/`](labs/section-kubernetes/INDEX.md)
-
-## 🏗️ Application Versions
-
-The demo application evolves across my learning. Each lab section references a specific version — download the ZIP from the course platform and extract it to your working directory before starting the corresponding labs.
-
-| Version    | Description                                                            | Docker Images                                                                                                                               |
-| ---------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v1.1.0** | Baseline application — no OpenTelemetry instrumentation                | [frontend](https://hub.docker.com/r/lmacademy/web-translator-frontend) • [worker](https://hub.docker.com/r/lmacademy/web-translator-worker) |
-| **v1.2.0** | Frontend fully instrumented — metrics, traces, and logs                | [frontend](https://hub.docker.com/r/lmacademy/web-translator-frontend) • [worker](https://hub.docker.com/r/lmacademy/web-translator-worker) |
-| **v1.3.0** | Both frontend and worker fully instrumented — end-to-end observability | [frontend](https://hub.docker.com/r/lmacademy/web-translator-frontend) • [worker](https://hub.docker.com/r/lmacademy/web-translator-worker) |
+See [section-setup/](section-setup/INDEX.md) for step-by-step deployment and configuration guides.
 
 
 

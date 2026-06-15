@@ -15,3 +15,6 @@ scrape_configs:
   - job_name: 'tempo'  # Job identifier for Tempo
     static_configs:
       - targets: ['tempo:3200']  # Tempo API endpoint for metrics    
+  - job_name: 'grafana'  # Job identifier for Grafana
+    static_configs:
+      - targets: ['grafana:3000']  # Grafana API endpoint for metrics     
