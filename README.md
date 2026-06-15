@@ -2,6 +2,9 @@
 
 A complete observability stack built with Docker Compose, featuring **Prometheus**, **Loki**, and **Tempo** for comprehensive metrics, logs, and distributed tracing.
 
+<img width="796" height="496" alt="sys" src="https://github.com/user-attachments/assets/1ea24d09-323c-49f8-8ebf-bc6ddd5e630e" />
+
+
 ## 📁 Project Structure
 
 ```
