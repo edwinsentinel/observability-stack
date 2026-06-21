@@ -267,6 +267,7 @@ The main lab sequence is:
 - [section-setup/project-deploy-application.md](section-setup/project-deploy-application.md)
 - [section-setup/project-local-development.md](section-setup/project-local-development.md)
 - [section-setup/project-test-collector.md](section-setup/project-test-collector.md)
+- [section-setup/project-collector-guide.md](section-setup/project-collector-guide.md)
 
 ---
 
