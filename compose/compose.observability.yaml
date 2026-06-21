@@ -72,7 +72,6 @@ services:
       - loki  # Requires Loki for logs
       - tempo  # Requires Tempo for traces
 
-  services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.146.1
     container_name: otel-collector
