@@ -17,7 +17,10 @@ scrape_configs:
       - targets: ['tempo:3200']  # Tempo API endpoint for metrics    
   - job_name: 'grafana'  # Job identifier for Grafana
     static_configs:
-      - targets: ['grafana:3000']  # Grafana API endpoint for metrics     
- -  job_name: 'otel-collector'
+      - targets: ['grafana:3000']  # Grafana API endpoint for metrics
+  - job_name: 'otel-collector'  # Job identifier for the collector
     static_configs:
-      - targets: ['otel-collector:8889'] # Prometheus metrics exporter endpoint for OpenTelemetry Collector      
+      - targets: ['otel-collector:8889']  # Prometheus metrics exporter endpoint for OpenTelemetry Collector
+  - job_name: 'otel-collector-internal'  # Job identifier for the collector internal metrics
+    static_configs:
+      - targets: ['otel-collector:8888']  # Internal metrics endpoint for OpenTelemetry Collector
