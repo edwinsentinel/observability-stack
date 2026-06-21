@@ -1,0 +1,57 @@
+# OpenTelemetry Collector configuration
+# This collector receives telemetry from apps and forwards it to the observability backends.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        # Accept OTLP/gRPC traces, metrics, and logs on port 4317
+        endpoint: 0.0.0.0:4317
+      http:
+        # Accept OTLP/HTTP telemetry on port 4318
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    # Group telemetry data into batches to reduce network overhead and improve efficiency
+    timeout: 10s
+    send_batch_size: 1024
+  memory_limiter:
+    # Prevent the collector from using too much memory under heavy load
+    check_interval: 1s
+    limit_mib: 512
+
+exporters:
+  otlp/tempo:
+    # Send traces to Tempo using OTLP/gRPC
+    endpoint: tempo:4317
+    tls:
+      # Allow insecure connection for local development setup
+      insecure: true
+  prometheus:
+    # Expose metrics for Prometheus to scrape
+    endpoint: 0.0.0.0:8889
+  otlphttp/loki:
+    # Send logs to Loki over OTLP/HTTP
+    endpoint: http://loki:3100/otlp
+    tls:
+      # Allow insecure connection for local development setup
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      # Trace pipeline: receive OTLP, process it, and export to Tempo
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/tempo]
+    metrics:
+      # Metrics pipeline: receive OTLP, process it, and export to Prometheus
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    logs:
+      # Logs pipeline: receive OTLP, process it, and export to Loki
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/loki]
