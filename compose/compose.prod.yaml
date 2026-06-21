@@ -1,0 +1,26 @@
+# Production Environment
+# Usage: docker compose -f compose.prod.yaml up
+
+# Include shared compose fragments: observability and app services
+include:
+  - compose.observability.yaml
+  - compose.app.yaml
+
+# Compose services for the production deployment
+services:
+  # Frontend service: serves the web UI
+  frontend:
+    image: lmacademy/web-translator-frontend:v1.1.0
+
+  # Worker service: background job processor
+  worker:
+    image: lmacademy/web-translator-worker:v1.1.0
+
+# Network definitions used by services
+networks:
+  observability:
+    driver: bridge
+    name: observability
+  app:
+    driver: bridge
+    name: app
