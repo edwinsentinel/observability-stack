@@ -9,28 +9,45 @@ A complete observability stack built with Docker Compose, featuring **Prometheus
 
 ```
 opentelemetrycode/
-├── compose/                          # Docker Compose orchestration
-│   ├── compose.yaml                 # Main compose file (includes observability stack)
-│   ├── compose.observability.yaml   # Observability services definitions
-│   ├── prometheus.yaml              # Prometheus configuration (metrics scraping, retention)
-│   ├── loki-config.yaml             # Loki configuration (log pipelines, storage)
-│   ├── tempo-config.yaml            # Tempo configuration (trace ingestion, storage)
+├── compose/                          # Docker Compose orchestration and configs
+│   ├── compose.app.yaml              # Application compose configuration
+│   ├── compose.dev.yaml              # Development compose overrides
+│   ├── compose.observability.yaml    # Observability stack compose definitions
+│   ├── compose.prod.yaml             # Production compose overrides
+│   ├── compose.yaml                  # Legacy/main compose file
 │   ├── grafana-datasources.yaml     # Grafana datasource auto-provisioning
+│   ├── loki-config.yaml             # Loki configuration (log pipelines, storage)
+│   ├── prometheus.yaml              # Prometheus configuration (scraping jobs)
+│   ├── otel-collector-config.yaml   # OpenTelemetry Collector config (receivers/exporters)
+│   ├── tempo-config.yaml            # Tempo configuration (trace ingestion/storage)
 │   └── test_scripts/                # Validation and testing scripts
-│       ├── validate-loki.sh         # Test Loki log ingestion and querying
-│       ├── validate-tempo.sh        # Test Tempo trace ingestion and storage
-│       ├── validate-grafana.sh      # Test Grafana and datasource connectivity
-│       ├── generate-traffic.sh      # Generate sample observability data
+│       ├── validate-loki.sh         # Test Loki connectivity and ingestion
+│       ├── validate-tempo.sh        # Test Tempo ingestion and queries
+│       ├── validate-grafana.sh      # Verify Grafana and datasources
+│       ├── generate-traffic.sh      # Generate sample observability traffic
 │       ├── cleanup-loki.sh          # Remove test data from Loki
-│       └── loki-promql-queries.md   # Example PromQL and LogQL queries
+│       └── loki-promql-qeries.md    # Example PromQL/LogQL queries (note filename as in repo)
+├── app-versions/                     # Versioned application code and examples
+│   └── code/                         # Application source and deployment manifests
+│       ├── frontend/                 # Frontend app (translation UI)
+│       ├── worker/                   # Background worker service
+│       ├── compose.yml               # App-level compose for local testing
+│       ├── compose.dev.yml
+│       ├── compose.yml               # (additional compose variants)
+│       ├── DEVELOPMENT.md            # Development notes
+│       └── README.md                 # App-level README
 ├── section-setup/                    # Deployment guides and lab instructions
-│   ├── INDEX.md                     # Guide index
-│   ├── lab-setup.md                 # Initial setup instructions
-│   ├── lab-deploy-prometheus.md     # Prometheus deployment guide
-│   ├── lab-deploy-loki.md           # Loki deployment guide
-│   ├── lab-deploy-tempo.md          # Tempo deployment guide
-│   ├── lab-deploy-grafana.md        # Grafana deployment guide
-│   └── lab-deploy-application.md    # Application deployment guide
+│   ├── INDEX.md
+│   ├── project-setup.md
+│   ├── project-deploy-application.md
+│   ├── project-deploy-collector.md
+│   ├── project-deploy-grafana.md
+│   ├── project-deploy-loki.md
+│   ├── project-deploy-prometheus.md
+│   ├── project-deploy-tempo.md
+│   ├── project-local-development.md
+│   ├── project-metrics-auto.md
+│   └── project-test-collector.md
 ├── README.md                         # This file
 └── .git/                             # Git repository
 ```
