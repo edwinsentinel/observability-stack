@@ -20,6 +20,9 @@ import {
 } from '../metrics.js';
 import { logger } from '../logger.js';
 
+// Router dependencies injected from application bootstrap.
+// queueService handles job persistence and session state,
+// sseManager manages open Server-Sent Events connections.
 export interface TranslationRouterDeps {
   queueService: QueueService;
   sseManager: SSEManager;
@@ -29,6 +32,9 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
   const router = Router();
   const { queueService, sseManager } = deps;
 
+  // Creates the translation router and wires dependencies.
+  // Each route uses queueService and sseManager to handle session state and streaming updates.
+
   // POST /api/translate - Submit translation request
   router.post('/', async (req: Request, res: Response) => {
     const start = Date.now();
@@ -37,6 +43,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       const body = req.body as TranslateRequest;
 
       // Validate text
+      // Reject any request without a valid non-empty text string.
       if (!body.text || typeof body.text !== 'string' || !body.text.trim()) {
         validationErrorsCounter.add(1, { error_type: 'empty_text' });
         logger.warn('Validation failed: empty text', {
@@ -52,6 +59,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Validate targetLanguages
+      // Ensure the client provided an array of languages to translate into.
       if (
         !Array.isArray(body.targetLanguages) ||
         body.targetLanguages.length === 0
@@ -70,6 +78,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Check max languages
+      // Limit the number of parallel translation targets to protect system resources.
       if (body.targetLanguages.length > 3) {
         validationErrorsCounter.add(1, { error_type: 'too_many_languages' });
         logger.warn('Validation failed: too many languages', {
@@ -86,6 +95,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Validate each language
+      // Filter any requested languages that are not supported.
       const unsupportedLanguages = body.targetLanguages.filter(
         (lang) => !SUPPORTED_LANGUAGES.includes(lang as any),
       );
@@ -106,6 +116,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Create session
+      // Each translation request becomes a session with one job per target language.
       const sessionId = uuidv4();
       const jobs = new Map<string, JobStatus>();
 
@@ -117,6 +128,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       });
 
       // Create and enqueue jobs
+      // Build a queue job for every target language and persist it for workers.
       const jobsList: TranslationJob[] = [];
 
       for (const targetLanguage of body.targetLanguages) {
@@ -146,6 +158,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Save session
+      // Persist the session metadata and current job statuses so clients can poll later.
       const session: TranslationSession = {
         sessionId,
         text: body.text,
@@ -198,6 +211,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
   });
 
   // GET /api/translate/:sessionId - Get session status
+  // Returns session metadata and translation job statuses for a specific session.
   router.get('/:sessionId', async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params as unknown & { sessionId: string };
@@ -210,6 +224,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
       }
 
       // Convert Map to object for JSON response
+      // Maps are not directly serializable in JSON, so build a plain object.
       const translations: Record<string, JobStatus> = {};
       for (const [lang, jobStatus] of session.jobs.entries()) {
         translations[lang] = jobStatus;
@@ -236,6 +251,7 @@ export function createTranslationRouter(deps: TranslationRouterDeps): Router {
   });
 
   // GET /api/translate/:sessionId/events - SSE endpoint
+  // Establishes a stream connection for real-time session updates.
   router.get('/:sessionId/events', async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params as unknown & { sessionId: string };
